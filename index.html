@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F96000">
+<meta property="og:title" content="Ebru Teknesi">
+<meta property="og:description" content="UNFPA renkleriyle tarayıcıda ebru yap. COP31 Antalya.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23131619'/%3E%3Ccircle cx='16' cy='16' r='10' fill='%23EFF1F7'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23F96000'/%3E%3C/svg%3E">
+<title>Ebru Teknesi</title>
+<meta name="description" content="UNFPA renkleriyle tarayıcıda ebru: damla, bız ve tarakla desen yap, görsel ve video olarak kaydet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: full-viewport app. Tool rail on the left, the tray fills the rest. On phones the rail drops under the tray and scrolls sideways. */
+:root{
+  --bg:#E3E5EB; --panel:#FFFFFF; --fg:#131619; --muted:#686A6C; --line:#D9DBE1; --hover:#EFF1F7;
+  --accent:#F96000; --accent-fg:#FFFFFF; --sel:#131619; --tray-shadow:rgba(19,22,25,.18);
+  --display:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0D10; --panel:#16191D; --fg:#EFF1F7; --muted:#9EA1A6; --line:#2A2E33; --hover:#20242A;
+  --accent:#FB904D; --accent-fg:#131619; --sel:#EFF1F7; --tray-shadow:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0D10; --panel:#16191D; --fg:#EFF1F7; --muted:#9EA1A6; --line:#2A2E33; --hover:#20242A;
+  --accent:#FB904D; --accent-fg:#131619; --sel:#EFF1F7; --tray-shadow:rgba(0,0,0,.6); color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:13px;line-height:1.4;overflow:hidden;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px}
+.app{height:100%;display:grid;grid-template-columns:252px minmax(0,1fr);gap:16px}
+.rail{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:15px;overflow-y:auto;min-width:0}
+.brand h1{font-family:var(--display);font-weight:700;font-size:25px;line-height:1.02;margin:0;letter-spacing:-.015em}
+.brand p{margin:4px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sec{display:flex;flex-direction:column;gap:8px}
+.lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.lab b{font-weight:500;color:var(--fg);letter-spacing:.04em;text-transform:none;font-family:var(--body);font-size:12px}
+button,select{font:inherit;color:var(--fg)}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 7px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:700;font-size:12px}
+.tool:hover{background:var(--hover)}
+.tool[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.tool svg{width:24px;height:24px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.act{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:700;font-size:12px;text-align:left}
+.act:hover{background:var(--hover)}
+.act svg{width:18px;height:18px;flex:none}
+.act:disabled{opacity:.4;cursor:default}
+.act.primary{background:var(--fg);color:var(--panel);border-color:var(--fg)}
+.act.rec{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 6px}
+.sw button{aspect-ratio:1;border-radius:50%;border:none;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(19,22,25,.16);position:relative}
+.sw button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--sel)}
+.accrow{display:flex;gap:6px}
+.accrow button{flex:1;padding:5px 0;border-radius:20px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px}
+.accrow button i{width:9px;height:9px;border-radius:50%}
+.accrow button[aria-pressed="true"]{border-color:var(--sel)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 10px;border-radius:20px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;gap:6px}
+.chip i{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(19,22,25,.25)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--panel);border-color:var(--fg)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.status{font-size:12px;color:var(--muted);min-height:1.4em}
+.status.on{color:var(--accent);font-weight:700}
+.foot{margin-top:auto;font-size:11px;color:var(--muted)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stage{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
+canvas{display:block;border-radius:6px;box-shadow:0 1px 2px var(--tray-shadow),0 24px 60px var(--tray-shadow);touch-action:none;cursor:crosshair}
+.tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(19,22,25,.82);color:#EFF1F7;font-size:12px;padding:7px 14px;border-radius:20px;pointer-events:none;transition:opacity .4s;white-space:nowrap}
+@media (max-width:760px){
+  body{padding-block:10px}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:10px}
+  .stage{order:1}
+  .rail{order:2;flex-direction:row;align-items:flex-start;overflow-x:auto;overflow-y:hidden;padding:10px;gap:16px;max-height:124px}
+  .chips{flex-wrap:nowrap}.sw{padding:0}
+  .rail .sec{flex:none;width:auto}
+  .brand,.foot,.hide-m{display:none}
+  .tools{grid-template-columns:repeat(3,58px)}
+  .sw{grid-template-columns:repeat(8,26px);gap:6px}
+  .sw.acc{grid-template-columns:repeat(4,26px)}
+  .acts{grid-template-columns:repeat(2,auto)}
+  .sec.size{width:130px}
+}
+@media (prefers-reduced-motion: reduce){.tip{transition:none}}
+</style>
+<style>body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{height:100%}</style>
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="rail" aria-label="Aletler ve palet">
+    <div class="brand">
+      <h1>Ebru<br>Teknesi</h1>
+      <p>UNFPA · COP31 Antalya</p>
+    </div>
+
+    <div class="sec">
+      <div class="lab">Alet</div>
+      <div class="tools" role="group" aria-label="Alet">
+        <button class="tool" data-tool="drop" aria-pressed="true" title="Damla: dokun, basılı tutarak büyüt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.5c3.4 4.4 6 7.6 6 10.8a6 6 0 0 1-12 0c0-3.2 2.6-6.4 6-10.8z"/><path d="M9.2 15.2a3 3 0 0 0 2.6 2.4" stroke-linecap="round"/></svg>Damla</button>
+        <button class="tool" data-tool="needle" aria-pressed="false" title="Bız: sürükleyerek boyayı çek">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 20l9.5-9.5"/><rect x="13.2" y="3.6" width="4.2" height="9" rx="1.6" transform="rotate(45 15.3 8.1)"/><path d="M3 21l1-1"/></svg>Bız</button>
+        <button class="tool" data-tool="comb" aria-pressed="false" title="Tarak: bütün tekneyi tara">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 6.5h17"/><path d="M5.5 6.5V18M9.2 6.5V18M12.9 6.5V18M16.6 6.5V18M20.3 6.5V18"/></svg>Tarak</button>
+      </div>
+    </div>
+
+    <div class="sec size">
+      <div class="lab"><span>Boyut</span><b id="sizev">Orta</b></div>
+      <input type="range" id="size" min="0" max="100" value="40" aria-label="Boyut">
+    </div>
+
+    <div class="sec">
+      <div class="lab"><span>Boya</span><b id="cname">UNFPA Orange</b></div>
+      <div class="sw" id="sw" role="group" aria-label="Ana renkler"></div>
+    </div>
+
+    <div class="sec">
+      <div class="lab"><span>Vurgu</span><span class="hide-m">tek renk</span></div>
+      <div class="accrow" role="group" aria-label="Vurgu rengi">
+        <button data-acc="blue" aria-pressed="true"><i style="background:#2171EC"></i>Mavi</button>
+        <button data-acc="red" aria-pressed="false"><i style="background:#F10F45"></i>Kırmızı</button>
+        <button data-acc="purple" aria-pressed="false"><i style="background:#9C1ED6"></i>Mor</button>
+      </div>
+      <div class="sw acc" id="sw2" role="group" aria-label="Vurgu tonları"></div>
+    </div>
+
+    <div class="sec">
+      <div class="lab">Zemin</div>
+      <div class="chips" role="group" aria-label="Zemin">
+        <button class="chip" data-g="#EFF1F7" aria-pressed="true"><i style="background:#EFF1F7"></i>Kırık beyaz</button>
+        <button class="chip" data-g="#F6EDE4" aria-pressed="false"><i style="background:#F6EDE4"></i>Ten</button>
+        <button class="chip" data-g="#131619" aria-pressed="false"><i style="background:#131619"></i>Siyah</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="lab">Eylem</div>
+      <div class="acts">
+        <button class="act" id="battal"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="7" r="1.8"/><circle cx="13" cy="5" r="1.2"/><circle cx="18" cy="9" r="2.2"/><circle cx="9" cy="13" r="2.4"/><circle cx="16" cy="16" r="1.4"/><circle cx="6" cy="19" r="1.3"/><circle cx="12" cy="20" r="1"/></svg>Battal</button>
+        <button class="act" id="family"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.2"/><path d="M3 20c0-6 1.2-9.5 3-9.5S9 14 9 20z"/><circle cx="14" cy="7.5" r="2"/><path d="M11 20c.6-5 1.4-8 3-8s2.4 3 3 8z"/><circle cx="20" cy="12" r="1.5"/><path d="M18.3 20c.3-3 .8-5 1.7-5s1.4 2 1.7 5z"/></svg>Aile</button>
+        <button class="act" id="undo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5"/><path d="M4 12h10a6 6 0 0 1 0 12h-2" transform="translate(0 -4)"/></svg>Geri al</button>
+        <button class="act" id="clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/></svg><span>Temizle</span></button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="lab">Tekne ve kayıt</div>
+      <div class="chips" role="group" aria-label="Tekne oranı">
+        <button class="chip" data-f="full" aria-pressed="true">Tam</button>
+        <button class="chip" data-f="4:5" aria-pressed="false">4:5</button>
+        <button class="chip" data-f="1:1" aria-pressed="false">1:1</button>
+        <button class="chip" data-f="9:16" aria-pressed="false">9:16</button>
+      </div>
+      <div class="acts">
+        <button class="act primary" id="png"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4 4 3 3-2 4 3"/></svg>Görsel</button>
+        <button class="act rec" id="rec"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg><span>Video</span></button>
+      </div>
+      <button class="act" id="vdl" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Videoyu indir</button>
+      <div class="status" id="status" aria-live="polite"></div>
+    </div>
+
+    <p class="foot">Kâğıda geçtiğinde geri alınamaz. Teknede hâlâ değiştirebilirsin.</p>
+  </aside>
+
+  <main class="stage" id="stage">
+    <canvas id="cv" aria-label="Ebru teknesi. Dokunarak boya damlat, sürükleyerek desen çek."></canvas>
+    <div class="tip" id="tip">Dokun: damla · Basılı tut: büyüt</div>
+  </main>
+</div>
+
+<script>
+(()=>{
+// ---------- palette (UNFPA brand) ----------
+const PRIMARY=[
+  ["UNFPA Orange","#F96000"],["Dark Orange","#AE4300"],["Pastel Orange","#FB904D"],["Light Orange","#FDCFB3"],
+  ["UNFPA Black","#131619"],["Grey","#686A6C"],["Light Grey","#D9DBE1"],["Off White","#EFF1F7"]
+];
+const ACCENTS={
+  blue:[["UNFPA Blue","#2171EC"],["Dark Blue","#184EA5"],["Pastel Blue","#649BF2"],["Light Blue","#BDD4F9"]],
+  red:[["UNFPA Red","#F10F45"],["Dark Red","#A00F31"],["Pastel Red","#ED5B7E"],["Light Red","#F7B9C8"]],
+  purple:[["UNFPA Purple","#9C1ED6"],["Dark Purple","#6D1496"],["Pastel Purple","#BA61E2"],["Light Purple","#E1BBF3"]]
+};
+const $=id=>document.getElementById(id);
+const cv=$("cv"),ctx=cv.getContext("2d"),stage=$("stage");
+let W=1200,H=1500,U=1200,fmt="full";
+let shapes=[],ground="#EFF1F7",tool="drop",color=PRIMARY[0][1],size=0.4,accentKey="blue";
+let history=[],active=null,stroke=null,dirty=true,ops=[],op=null;
+const MAXSEG=0.0028,MAXPTS=9000;
+
+// ---------- colour helpers ----------
+const hex2rgb=h=>{const n=parseInt(h.slice(1),16);return[n>>16,n>>8&255,n&255]};
+const rgb=(r,g,b,a)=>a==null?`rgb(${r|0},${g|0},${b|0})`:`rgba(${r|0},${g|0},${b|0},${a})`;
+// each drop of pigment lands slightly differently: a small, stable shift in value
+function jitter(hex){const[r,g,b]=hex2rgb(hex),k=1+(Math.random()-.5)*0.07;return rgb(Math.min(255,r*k),Math.min(255,g*k),Math.min(255,b*k))}
+function edge(hex,a){const[r,g,b]=hex2rgb(hex),lum=(r+g+b)/3,f=lum>200?0.86:0.62,k=lum>200?0.45:1;return rgb(r*f,g*f,b*f,a*k)}
+const mkShape=(pts,c)=>({pts,color:c,fill:jitter(c)});
+
+// ---------- marbling geometry ----------
+function circle(cx,cy,r,n){const p=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2;p.push(cx+Math.cos(a)*r,cy+Math.sin(a)*r)}return p}
+const circleN=r=>Math.max(48,Math.min(1800,Math.round(2*Math.PI*r/MAXSEG)));
+function displaceDrop(p,cx,cy,dR2){for(let i=0;i<p.length;i+=2){const dx=p[i]-cx,dy=p[i+1]-cy,d2=dx*dx+dy*dy;if(d2<1e-12)continue;const s=Math.sqrt(1+dR2/d2);p[i]=cx+dx*s;p[i+1]=cy+dy*s}}
+function displaceNeedle(p,ax,ay,bx,by,sig){
+  const vx=bx-ax,vy=by-ay,L2=vx*vx+vy*vy||1e-12,cut=sig*12;
+  const x0=Math.min(ax,bx)-cut,x1=Math.max(ax,bx)+cut,y0=Math.min(ay,by)-cut,y1=Math.max(ay,by)+cut;
+  for(let i=0;i<p.length;i+=2){const x=p[i],y=p[i+1];if(x<x0||x>x1||y<y0||y>y1)continue;
+    let t=((x-ax)*vx+(y-ay)*vy)/L2;t=t<0?0:t>1?1:t;const d=Math.hypot(x-(ax+vx*t),y-(ay+vy*t));
+    const f=(sig/(d+sig))*Math.exp(-d/(5*sig));p[i]=x+vx*f;p[i+1]=y+vy*f}
+}
+function displaceComb(p,sx,sy,vx,vy,sp,sig){
+  const L=Math.hypot(vx,vy)||1e-12,nx=-vy/L,ny=vx/L;
+  for(let i=0;i<p.length;i+=2){const n=(p[i]-sx)*nx+(p[i+1]-sy)*ny;let m=((n%sp)+sp)%sp;m=Math.min(m,sp-m);const f=sig/(m+sig);p[i]+=vx*f;p[i+1]+=vy*f}
+}
+function refine(s){
+  const p=s.pts,n=p.length/2;if(n>=MAXPTS)return;
+  let need=false;for(let i=0;i<n;i++){const j=(i+1)%n,dx=p[2*j]-p[2*i],dy=p[2*j+1]-p[2*i+1];if(dx*dx+dy*dy>MAXSEG*MAXSEG){need=true;break}}
+  if(!need)return;
+  const out=[];
+  for(let i=0;i<n;i++){const j=(i+1)%n,h=(i-1+n)%n,k=(j+1)%n,x0=p[2*i],y0=p[2*i+1];out.push(x0,y0);
+    const L=Math.hypot(p[2*j]-x0,p[2*j+1]-y0);
+    if(L>MAXSEG&&out.length/2<MAXPTS){const q=Math.min(8,Math.ceil(L/MAXSEG));
+      for(let m=1;m<q;m++){const t=m/q,t2=t*t,t3=t2*t;for(let d=0;d<2;d++){const P0=p[2*h+d],P1=p[2*i+d],P2=p[2*j+d],P3=p[2*k+d];
+        out.push(0.5*((2*P1)+(-P0+P2)*t+(2*P0-5*P1+4*P2-P3)*t2+(-P0+3*P1-3*P2+P3)*t3))}}}}
+  s.pts=out;
+}
+const refineAll=()=>{for(const s of shapes)refine(s)};
+function cull(){const mx=W/U/2+0.4,my=H/U/2+0.4;shapes=shapes.filter(s=>{const p=s.pts;for(let i=0;i<p.length;i+=2)if(Math.abs(p[i])<mx&&Math.abs(p[i+1])<my)return true;return false})}
+function addDropInstant(x,y,r,c){for(const s of shapes)displaceDrop(s.pts,x,y,r*r);shapes.push(mkShape(circle(x,y,r,circleN(r)),c))}
+
+// ---------- surface textures (built once) ----------
+function valueNoise(size,cells,seed){
+  let s=seed;const rnd=()=>{s=(s*16807)%2147483647;return s/2147483647};
+  const g=[];for(let i=0;i<cells*cells;i++)g.push(rnd());
+  const out=new Float32Array(size*size),sm=t=>t*t*(3-2*t);
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){const fx=x/size*cells,fy=y/size*cells,ix=Math.floor(fx),iy=Math.floor(fy),tx=sm(fx-ix),ty=sm(fy-iy);
+    const a=g[(iy%cells)*cells+ix%cells],b=g[(iy%cells)*cells+(ix+1)%cells],c=g[((iy+1)%cells)*cells+ix%cells],d=g[((iy+1)%cells)*cells+(ix+1)%cells];
+    out[y*size+x]=a+(b-a)*tx+(c-a)*ty+(a-b-c+d)*tx*ty}
+  return out;
+}
+// pigment granulation: uneven settling of paint on the size bath
+const pigmentTex=(()=>{const S=512,c=document.createElement("canvas");c.width=c.height=S;const g=c.getContext("2d"),im=g.createImageData(S,S);
+  const n1=valueNoise(S,8,3),n2=valueNoise(S,32,7),n3=valueNoise(S,128,11);
+  for(let i=0;i<S*S;i++){const v=0.5*n1[i]+0.3*n2[i]+0.2*n3[i],grain=(Math.random()-.5)*0.25;const t=Math.max(0,Math.min(255,128+(v-.5)*150+grain*90));
+    im.data[4*i]=im.data[4*i+1]=im.data[4*i+2]=t;im.data[4*i+3]=255}
+  g.putImageData(im,0,0);return c})();
+// paper fibres: the sheet the pattern is lifted onto
+const paperTex=(()=>{const S=700,c=document.createElement("canvas");c.width=c.height=S;const g=c.getContext("2d");
+  g.fillStyle="#808080";g.fillRect(0,0,S,S);
+  for(let i=0;i<1400;i++){const x=Math.random()*S,y=Math.random()*S,l=6+Math.random()*26,a=Math.random()*Math.PI*2,light=Math.random()<.55;
+    g.strokeStyle=light?"rgba(255,255,255,.35)":"rgba(0,0,0,.18)";g.lineWidth=.6+Math.random()*.7;g.beginPath();g.moveTo(x,y);
+    g.quadraticCurveTo(x+Math.cos(a+.6)*l*.5,y+Math.sin(a+.6)*l*.5,x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke()}
+  const im=g.getImageData(0,0,S,S);for(let i=0;i<im.data.length;i+=4){const n=(Math.random()-.5)*26;im.data[i]+=n;im.data[i+1]+=n;im.data[i+2]+=n}
+  g.putImageData(im,0,0);return c})();
+let pigPat=null,papPat=null;
+
+// ---------- render ----------
+function path(p){ctx.beginPath();const cx=W/2,cy=H/2;ctx.moveTo(cx+p[0]*U,cy+p[1]*U);for(let i=2;i<p.length;i+=2)ctx.lineTo(cx+p[i]*U,cy+p[i+1]*U);ctx.closePath()}
+function render(){
+  if(!pigPat){pigPat=ctx.createPattern(pigmentTex,"repeat");papPat=ctx.createPattern(paperTex,"repeat")}
+  ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1;
+  ctx.fillStyle=ground;ctx.fillRect(0,0,W,H);
+  ctx.lineJoin="round";
+  const soft=Math.max(1.5,U*0.0042),crisp=Math.max(.8,U*0.0011);
+  const drawOne=(pts,c,fill)=>{path(pts);ctx.fillStyle=fill;ctx.fill();
+    ctx.lineWidth=soft;ctx.strokeStyle=edge(c,.2);ctx.stroke();      // pigment pooling at the edge
+    ctx.lineWidth=crisp;ctx.strokeStyle=edge(c,.55);ctx.stroke()};   // the fine rim left by ox-gall
+  for(const s of shapes)drawOne(s.pts,s.color,s.fill);
+  if(active&&active.r>0)drawOne(circle(active.x,active.y,active.r,Math.max(64,circleN(active.r)>>1)),active.color,active.fill);
+  // granulation + paper, then a soft fall-off of light toward the edges
+  ctx.save();
+  const sc=Math.max(1,U/900);ctx.setTransform(sc,0,0,sc,0,0);
+  ctx.globalCompositeOperation="soft-light";ctx.globalAlpha=.55;ctx.fillStyle=pigPat;ctx.fillRect(0,0,W/sc,H/sc);
+  ctx.globalCompositeOperation="overlay";ctx.globalAlpha=.32;ctx.fillStyle=papPat;ctx.fillRect(0,0,W/sc,H/sc);
+  ctx.restore();
+  ctx.save();ctx.globalCompositeOperation="multiply";
+  const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.hypot(W,H)*.62);
+  vg.addColorStop(0,"rgba(255,255,255,1)");vg.addColorStop(1,"rgba(222,218,212,1)");ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);ctx.restore();
+}
+
+// ---------- sizing: the tray fills the stage, or keeps a chosen ratio ----------
+function layout(){
+  const r=stage.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+  let cw=r.width,ch=r.height;
+  if(fmt!=="full"){const [a,b]=fmt.split(":").map(Number),ratio=a/b;if(cw/ch>ratio)cw=ch*ratio;else ch=cw/ratio}
+  cw=Math.max(80,Math.floor(cw));ch=Math.max(80,Math.floor(ch));
+  cv.style.width=cw+"px";cv.style.height=ch+"px";
+  const k=Math.min(dpr,2600/Math.max(cw,ch));
+  W=Math.round(cw*k);H=Math.round(ch*k);cv.width=W;cv.height=H;
+  // keep the pattern's scale tied to the tray's short side
+  U=Math.min(W,H);pigPat=null;dirty=true;
+}
+new ResizeObserver(()=>layout()).observe(stage);
+
+// ---------- history ----------
+function snap(){history.push({g:ground,s:shapes.map(s=>({color:s.color,fill:s.fill,pts:s.pts.slice()}))});if(history.length>15)history.shift();$("undo").disabled=false}
+$("undo").onclick=()=>{const h=history.pop();if(!h)return;ops=[];op=null;shapes=h.s;setGround(h.g,false);active=null;stroke=null;dirty=true;$("undo").disabled=!history.length};
+
+// ---------- pointer ----------
+function toU(e){const r=cv.getBoundingClientRect();return{x:((e.clientX-r.left)/r.width*W-W/2)/U,y:((e.clientY-r.top)/r.height*H-H/2)/U}}
+const baseR=()=>0.016+size*0.095,needleSig=()=>0.003+size*0.012,combSp=()=>0.025+size*0.075;
+cv.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  if(op||ops.length){showTip("Aile figürü oluşuyor…");return}
+  cv.setPointerCapture(e.pointerId);hideTip();
+  const p=toU(e);snap();
+  if(tool==="drop"){finishActive();active={x:p.x,y:p.y,r:0,R:baseR(),held:true,color,fill:jitter(color)}}
+  else stroke={x:p.x,y:p.y,sx:p.x,sy:p.y};
+});
+cv.addEventListener("pointermove",e=>{
+  if(!stroke)return;const p=toU(e);
+  const dx=p.x-stroke.x,dy=p.y-stroke.y,L=Math.hypot(dx,dy);if(L<1e-5)return;
+  const st=tool==="needle"?needleSig()*0.6:0.004,n=Math.max(1,Math.ceil(L/st));
+  for(let k=0;k<n;k++){const ax=stroke.x+dx*k/n,ay=stroke.y+dy*k/n,bx=stroke.x+dx*(k+1)/n,by=stroke.y+dy*(k+1)/n;
+    if(tool==="needle")for(const s of shapes)displaceNeedle(s.pts,ax,ay,bx,by,needleSig());
+    else for(const s of shapes)displaceComb(s.pts,stroke.sx,stroke.sy,bx-ax,by-ay,combSp(),0.006);
+    refineAll()}
+  stroke.x=p.x;stroke.y=p.y;dirty=true;
+});
+const up=()=>{if(active)active.held=false;if(stroke){stroke=null;cull()}};
+cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+function finishActive(){if(!active)return;shapes.push({pts:circle(active.x,active.y,active.r,circleN(active.r)),color:active.color,fill:active.fill});active=null;cull();dirty=true}
+
+// ---------- scripted moves (family figure) ----------
+function needleOp(pts,sig,speed){const st=sig*0.6,dense=[];
+  for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(L/st));for(let k=0;k<n;k++)dense.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n])}
+  dense.push(pts[pts.length-1]);return{k:"needle",dense,sig,rate:(speed||.5)/st,i:0,acc:0}}
+function stepOps(dt){
+  if(!op){if(active||!ops.length)return;op=ops.shift();
+    if(op.k==="drop"){active={x:op.x,y:op.y,r:0,R:op.r,held:false,color:op.c,fill:jitter(op.c),grow:op.g||.28};op=null;return}
+    if(op.k==="wait")op.t=0}
+  if(op.k==="wait"){op.t+=dt;if(op.t>=op.d)op=null;return}
+  op.acc+=op.rate*dt;let n=Math.floor(op.acc);op.acc-=n;
+  while(n-->0&&op.i<op.dense.length-1){const a=op.dense[op.i],b=op.dense[op.i+1];for(const s of shapes)displaceNeedle(s.pts,a[0],a[1],b[0],b[1],op.sig);op.i++}
+  refineAll();dirty=true;if(op.i>=op.dense.length-1){op=null;cull()}
+}
+function familyOps(){
+  const A=ACCENTS[accentKey].map(x=>x[1]),O=["#AE4300","#F96000","#FB904D","#FDCFB3"],B=["#131619","#686A6C","#D9DBE1"];
+  const fx=-0.25,mx=0.04,kx=0.25,L=[];
+  const ring=(x,y,radii,cols)=>radii.forEach((r,i)=>L.push({k:"drop",x,y,r,c:cols[i%cols.length]}));
+  const needle=(pts,sig,sp)=>L.push(needleOp(pts,sig,sp)),wait=d=>L.push({k:"wait",d});
+  [0.12,0.03,-0.06].forEach(y=>ring(fx,y,[0.05,0.034,0.018],B));
+  needle([[fx,-0.11],[fx,0.27]],0.012,0.45);ring(fx,-0.135,[0.042,0.027,0.012],B);wait(.3);
+  [0.12,0.04,-0.04].forEach(y=>ring(mx,y,[0.052,0.038,0.025,0.012],O));
+  needle([[mx,-0.08],[mx,0.27]],0.012,0.45);needle([[mx-0.015,0.05],[mx-0.085,0.25]],0.010,0.45);needle([[mx+0.015,0.05],[mx+0.085,0.25]],0.010,0.45);
+  ring(mx,-0.11,[0.04,0.026,0.012],O);wait(.3);
+  [0.15,0.08].forEach(y=>ring(kx,y,[0.036,0.024,0.012],A));
+  needle([[kx,0.04],[kx,0.25]],0.009,0.4);ring(kx,0.03,[0.03,0.019,0.009],A);wait(.3);
+  needle([[fx+0.01,-0.03],[mx-0.05,-0.03]],0.011,0.3);needle([[mx+0.015,0.0],[kx-0.01,0.1]],0.011,0.3);
+  return L;
+}
+
+// ---------- loop ----------
+function step(dt){
+  stepOps(dt);
+  if(active){let r=active.r;const g=active.grow||.22;
+    if(r<active.R)r=Math.min(active.R,r+active.R*dt/g);else if(active.held)r+=0.05*dt;else{finishActive();r=null}
+    if(r!=null&&active){const d=r*r-active.r*active.r;if(d>0){for(const s of shapes)displaceDrop(s.pts,active.x,active.y,d);refineAll()}active.r=r;dirty=true}}
+}
+let last=null;
+function frame(ts){const dt=last==null?0:Math.min(.05,(ts-last)/1000);last=ts;step(dt);if(dirty){render();dirty=false}requestAnimationFrame(frame)}
+window.__run=sec=>{for(let i=0;i<sec*60;i++)step(1/60);render()};
+
+// ---------- battal + opening pattern ----------
+function seedRand(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+function battal(c,count,rand){rand=rand||Math.random;const ex=W/U/2+0.02,ey=H/U/2+0.02;
+  for(let i=0;i<count;i++){const r=0.004+rand()*rand()*0.022;addDropInstant((rand()*2-1)*ex,(rand()*2-1)*ey,r,c)}
+  refineAll();dirty=true}
+function seed(){
+  shapes=[];const r=seedRand(11);
+  battal("#D9DBE1",Math.round(150*Math.max(W,H)/U),r);battal("#FDCFB3",Math.round(50*Math.max(W,H)/U),r);
+  [["#131619",0.13],["#EFF1F7",0.10],["#F96000",0.075],["#AE4300",0.05],["#FDCFB3",0.028]].forEach(([c,R])=>addDropInstant(0,-0.02,R,c));
+  addDropInstant(-0.28,0.3,0.06,"#F96000");addDropInstant(-0.28,0.3,0.035,"#EFF1F7");
+  addDropInstant(0.27,-0.33,0.05,"#686A6C");addDropInstant(0.27,-0.33,0.025,"#FB904D");
+  refineAll();dirty=true;
+}
+
+// ---------- UI ----------
+function markSel(){document.querySelectorAll(".sw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===color?"true":"false"))}
+function swatches(el,list){el.innerHTML="";list.forEach(([n,c])=>{const b=document.createElement("button");b.style.background=c;b.title=n;b.setAttribute("aria-label",n);b.dataset.c=c;
+  b.onclick=()=>{color=c;$("cname").textContent=n;markSel()};el.appendChild(b)});markSel()}
+swatches($("sw"),PRIMARY);swatches($("sw2"),ACCENTS[accentKey]);
+document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>{
+  const wasAcc=Object.values(ACCENTS).flat().some(x=>x[1]===color);accentKey=b.dataset.acc;
+  document.querySelectorAll("[data-acc]").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+  if(wasAcc){color=ACCENTS[accentKey][0][1];$("cname").textContent=ACCENTS[accentKey][0][0]}
+  swatches($("sw2"),ACCENTS[accentKey])});
+const TIPS={drop:"Dokun: damla · Basılı tut: büyüt",needle:"Sürükle: boyayı iğneyle çek",comb:"Sürükle: tarak bütün tekneyi tarar"};
+document.querySelectorAll(".tool").forEach(b=>b.onclick=()=>{tool=b.dataset.tool;document.querySelectorAll(".tool").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));showTip(TIPS[tool])});
+$("size").oninput=e=>{size=e.target.value/100;$("sizev").textContent=size<0.25?"Küçük":size<0.6?"Orta":"Büyük"};
+function setGround(g,push){if(push)snap();ground=g;document.querySelectorAll("[data-g]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===g?"true":"false"));dirty=true}
+document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>setGround(b.dataset.g,true));
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{fmt=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));layout()});
+$("battal").onclick=()=>{snap();finishActive();battal(color,Math.round(70*Math.max(W,H)/U));cull()};
+$("family").onclick=()=>{if(op||ops.length)return;snap();finishActive();ops=familyOps();showTip("Aile figürü damla damla oluşuyor")};
+let clearArm=0;const clearLbl=$("clear").querySelector("span");
+$("clear").onclick=()=>{
+  if(Date.now()-clearArm>2500){clearArm=Date.now();clearLbl.textContent="Emin misin?";setTimeout(()=>{clearLbl.textContent="Temizle"},2500);return}
+  snap();shapes=[];active=null;ops=[];op=null;dirty=true;clearLbl.textContent="Temizle";clearArm=0;status("Tekne temizlendi. Geri al ile dönebilirsin.")};
+const tipEl=$("tip");let tipT;
+function showTip(t){tipEl.textContent=t;tipEl.style.opacity=1;clearTimeout(tipT);tipT=setTimeout(hideTip,2600)}
+function hideTip(){tipEl.style.opacity=0}
+function status(t,on){$("status").textContent=t;$("status").classList.toggle("on",!!on)}
+
+// ---------- saving ----------
+let dlCap;
+async function getDL(){if(dlCap!==undefined)return dlCap;dlCap=window.claude&&window.claude.use?await window.claude.use("downloads").catch(()=>null):null;return dlCap}
+async function saveBlob(blob,name){
+  const dl=await getDL();
+  if(dl){try{await dl.save({filename:name,data:blob});status("Kaydedildi.")}catch(e){status(e&&e.code==="declined"?"Kaydetme iptal edildi.":"Kaydedilemedi.")}return}
+  const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);status("İndirildi.")}
+const stamp=()=>new Date().toISOString().slice(0,16).replace(/[-:T]/g,"");
+$("png").onclick=()=>{render();cv.toBlob(b=>b&&saveBlob(b,`ebru-${stamp()}.png`),"image/png")};
+let rec=null,chunks=[],vblob=null,vext="webm";const recLbl=$("rec").querySelector("span");
+$("rec").onclick=()=>{
+  if(rec){rec.stop();return}
+  if(!window.MediaRecorder||!cv.captureStream){status("Bu tarayıcı video kaydını desteklemiyor.");return}
+  const t=["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9","video/webm"].find(x=>MediaRecorder.isTypeSupported(x))||"";vext=t.includes("mp4")?"mp4":"webm";
+  try{rec=new MediaRecorder(cv.captureStream(60),{mimeType:t||undefined,videoBitsPerSecond:14e6})}catch(err){status("Kayıt başlatılamadı.");rec=null;return}
+  chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  rec.onstop=()=>{vblob=new Blob(chunks,{type:rec.mimeType||"video/webm"});rec=null;recLbl.textContent="Video";$("vdl").hidden=false;status(`Video hazır (${vext.toUpperCase()}, ${(vblob.size/1e6).toFixed(1)} MB).`)};
+  rec.start(250);dirty=true;recLbl.textContent="Durdur";$("vdl").hidden=true;status("Kaydediliyor… Teknede çalışmaya devam et.",true)};
+$("vdl").onclick=()=>{if(vblob)saveBlob(vblob,`ebru-${stamp()}.${vext}`)};
+
+// ---------- boot ----------
+layout();seed();requestAnimationFrame(frame);setTimeout(hideTip,4500);
+})();
+</script>
+
+</body>
+</html>
