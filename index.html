@@ -10,15 +10,16 @@
 <title>Ebru Tray</title>
 <meta name="description" content="Marble paper in the browser with UNFPA colours: drop, stylus and comb, then save an image or video. Not a Single Degree More, COP31 Antalya.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700;800&family=Atkinson+Hyperlegible+Mono:wght@500&display=swap">
 <style>
 /* Layout: full-viewport app. Tool rail on the left, the tray fills the rest. On phones the rail drops under the tray and scrolls sideways. */
 :root{
   --bg:#E3E5EB; --panel:#FFFFFF; --fg:#131619; --muted:#686A6C; --line:#D9DBE1; --hover:#EFF1F7;
   --accent:#F96000; --accent-fg:#FFFFFF; --sel:#131619; --tray-shadow:rgba(19,22,25,.18);
-  --display:"Atkinson Hyperlegible", system-ui, sans-serif;
-  --body:"Atkinson Hyperlegible", system-ui, sans-serif;
-  --mono:"IBM Plex Mono", ui-monospace, monospace;
+  --display:"Atkinson Hyperlegible Next", "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible Next", "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --mono:"Atkinson Hyperlegible Mono", ui-monospace, monospace;
+  --ink:#131619; --paper:#EFF1F7; --orange:#F96000;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0B0D10; --panel:#16191D; --fg:#EFF1F7; --muted:#9EA1A6; --line:#2A2E33; --hover:#20242A;
@@ -32,11 +33,11 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:13px;line-height:1.4;overflow:hidden;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px}
 .app{height:100%;display:grid;grid-template-columns:252px minmax(0,1fr);gap:16px}
-.rail{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:15px;overflow-y:auto;min-width:0}
-.brand h1{font-family:var(--display);font-weight:700;font-size:25px;line-height:1.02;margin:0;letter-spacing:-.015em}
-.brand p{margin:4px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.rail{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 14px;display:flex;flex-direction:column;gap:15px;overflow-y:auto;min-width:0}
+.brand h1{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.02;margin:0;letter-spacing:-.015em}
+.brand p{margin:6px 0 0;font-family:var(--body);font-weight:700;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .sec{display:flex;flex-direction:column;gap:8px}
-.lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.lab{font-family:var(--body);font-weight:700;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
 .lab b{font-weight:500;color:var(--fg);letter-spacing:.04em;text-transform:none;font-family:var(--body);font-size:12px}
 button,select{font:inherit;color:var(--fg)}
 .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -45,11 +46,14 @@ button,select{font:inherit;color:var(--fg)}
 .tool[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 .tool svg{width:24px;height:24px}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.act{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:700;font-size:12px;text-align:left}
-.act:hover{background:var(--hover)}
+.act{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:700;font-size:12px;text-align:left}
+.act:hover{background:var(--hover);border-color:var(--accent)}
 .act svg{width:18px;height:18px;flex:none}
 .act:disabled{opacity:.4;cursor:default}
 .act.primary{background:var(--fg);color:var(--panel);border-color:var(--fg)}
+.act.paper{grid-column:1/-1;justify-content:center;background:var(--accent);color:var(--accent-fg);border-color:var(--accent);padding:11px 14px;font-size:13px}
+.act.paper:hover{background:var(--accent);filter:brightness(1.06)}
+.act[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
 .act.rec{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
 .sw{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 6px}
 .sw button{aspect-ratio:1;border-radius:50%;border:none;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(19,22,25,.16);position:relative}
@@ -65,7 +69,7 @@ button,select{font:inherit;color:var(--fg)}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .status{font-size:12px;color:var(--muted);min-height:1.4em}
 .kits{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.kit{display:grid;grid-template-columns:10px 1fr;column-gap:7px;align-items:center;text-align:left;padding:8px 9px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer}
+.kit{display:grid;grid-template-columns:10px 1fr;column-gap:7px;align-items:center;text-align:left;padding:8px 9px;border-radius:8px;border:1px solid var(--line);background:transparent;cursor:pointer}
 .kit:hover{background:var(--hover)}
 .kit i{width:10px;height:10px;border-radius:50%;grid-row:span 2}
 .kit b{font-size:12.5px}
@@ -78,6 +82,34 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .stage{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
 #ov{position:absolute;pointer-events:none;box-shadow:none;border-radius:0}
 canvas{display:block;border-radius:6px;box-shadow:0 1px 2px var(--tray-shadow),0 24px 60px var(--tray-shadow);touch-action:none;cursor:crosshair}
+/* welcome: the tray fills the window, a dark scrim carries the words (UNFPA hero pattern) */
+body.welcome .rail,body.clean .rail{display:none}
+body.welcome .app,body.clean .app{grid-template-columns:minmax(0,1fr)}
+body.welcome .tip{display:none}
+.welcome-pane{position:absolute;inset:0;display:flex;align-items:flex-end;pointer-events:none;border-radius:6px;overflow:hidden}
+.welcome-pane[hidden]{display:none}
+.welcome-pane::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(19,22,25,.9) 0%,rgba(19,22,25,.72) 38%,rgba(19,22,25,0) 72%),linear-gradient(0deg,rgba(19,22,25,.55),rgba(19,22,25,0) 45%)}
+.welcome-copy{position:relative;max-width:620px;padding:clamp(24px,5vw,64px);color:#fff;pointer-events:auto;display:flex;flex-direction:column;gap:18px}
+.welcome-copy .eyebrow{font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#FDCFB3}
+.welcome-copy h2{font-family:var(--display);font-weight:800;font-size:clamp(40px,6.4vw,84px);line-height:.98;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.welcome-copy p{font-size:clamp(15px,1.4vw,18px);line-height:1.55;margin:0;max-width:52ch;color:#E3E5EB}
+.welcome-copy .ctas{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px}
+.pill{font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:13px 24px;cursor:pointer;border:1px solid var(--orange)}
+.pill.solid{background:var(--orange);color:#fff}
+.pill.solid:hover{filter:brightness(1.07)}
+.pill.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.85)}
+.pill.ghost:hover{background:rgba(255,255,255,.1)}
+.welcome-copy .fine{font-size:12px;color:#B8BBC0;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.welcome-copy .fine label{display:flex;gap:6px;align-items:center;cursor:pointer;color:#E3E5EB}
+/* the print: what the paper lifts off the water */
+.print-pane{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(19,22,25,.55);backdrop-filter:blur(3px);border-radius:6px;padding:16px}
+.print-card{background:var(--panel);color:var(--fg);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:14px;max-width:min(560px,100%);max-height:100%;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.print-card img{display:block;max-width:100%;max-height:62vh;object-fit:contain;border-radius:2px;box-shadow:0 2px 10px rgba(19,22,25,.18);background:#fff}
+.print-card h3{margin:0;font-size:20px;font-weight:800}
+.print-card p{margin:0;color:var(--muted);font-size:14px}
+.print-card .row{display:flex;gap:8px;flex-wrap:wrap}
+.print-card .pill.ghost{color:var(--fg);border-color:var(--orange)}
+.show-tools{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:12px;font:inherit;font-weight:700;font-size:12px;border-radius:999px;padding:8px 14px;border:1px solid var(--orange);background:var(--panel);color:var(--fg);cursor:pointer}
 .tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(19,22,25,.82);color:#EFF1F7;font-size:12px;padding:7px 14px;border-radius:20px;pointer-events:none;transition:opacity .4s;white-space:nowrap}
 @media (max-width:760px){
   body{padding-block:10px}
@@ -93,6 +125,7 @@ canvas{display:block;border-radius:6px;box-shadow:0 1px 2px var(--tray-shadow),0
   .acts{grid-template-columns:repeat(2,auto)}
   .sec.size{width:130px}
 }
+@media (max-width:760px){.welcome-pane::before{background:linear-gradient(0deg,rgba(19,22,25,.92) 0%,rgba(19,22,25,.75) 50%,rgba(19,22,25,.1) 85%)}}
 @media (prefers-reduced-motion: reduce){.tip{transition:none}}
 </style>
 <style>body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{height:100%}</style>
@@ -162,9 +195,12 @@ canvas{display:block;border-radius:6px;box-shadow:0 1px 2px var(--tray-shadow),0
     <div class="sec">
       <div class="lab">Actions</div>
       <div class="acts">
+        <button class="act paper" id="paper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M5 9c3 1.5 5-1.5 7 0s4 1.5 7 0" stroke-linecap="round"/></svg>Lay the paper</button>
         <button class="act" id="battal"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="7" r="1.8"/><circle cx="13" cy="5" r="1.2"/><circle cx="18" cy="9" r="2.2"/><circle cx="9" cy="13" r="2.4"/><circle cx="16" cy="16" r="1.4"/><circle cx="6" cy="19" r="1.3"/><circle cx="12" cy="20" r="1"/></svg>Sprinkle</button>
         <button class="act" id="family"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.2"/><path d="M3 20c0-6 1.2-9.5 3-9.5S9 14 9 20z"/><circle cx="14" cy="7.5" r="2"/><path d="M11 20c.6-5 1.4-8 3-8s2.4 3 3 8z"/><circle cx="20" cy="12" r="1.5"/><path d="M18.3 20c.3-3 .8-5 1.7-5s1.4 2 1.7 5z"/></svg>Family</button>
         <button class="act" id="undo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5"/><path d="M4 12h10a6 6 0 0 1 0 12h-2" transform="translate(0 -4)"/></svg>Undo</button>
+        <button class="act" id="sound" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>Sound</button>
+        <button class="act" id="hideui"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16"/><path d="M9.5 5.4A9.8 9.8 0 0 1 12 5c5 0 8.5 4.5 9.5 7a13 13 0 0 1-3 4.1M6.2 7.2A13.4 13.4 0 0 0 2.5 12c1 2.5 4.5 7 9.5 7a9.4 9.4 0 0 0 4-.9"/></svg>Hide UI</button>
         <button class="act" id="clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/></svg><span>Clear</span></button>
       </div>
     </div>
@@ -192,6 +228,27 @@ canvas{display:block;border-radius:6px;box-shadow:0 1px 2px var(--tray-shadow),0
     <canvas id="cv" aria-label="Ebru tray. Tap to drop paint, drag to draw patterns."></canvas>
     <canvas id="ov" aria-hidden="true"></canvas>
     <div class="tip" id="tip">Tap: drop · Hold: grow</div>
+    <div class="welcome-pane" id="welcome">
+      <div class="welcome-copy">
+        <span class="eyebrow">UNFPA · COP31 Antalya · Ebru</span>
+        <h2>Not a Single Degree More.</h2>
+        <p>Ebru is the Turkish art of painting on water. Every new drop pushes the last one aside, and once paper touches the surface, the pattern can never be made the same way again. A warming climate works the same way, and it pushes women and girls aside first.</p>
+        <div class="ctas">
+          <button class="pill solid" id="enter">Enter the tray</button>
+          <button class="pill ghost" id="watch">Watch a campaign kit</button>
+        </div>
+        <div class="fine"><label><input type="checkbox" id="snd0"> Sound on</label><span>Tap to drop · drag to pull · comb to rake</span></div>
+      </div>
+    </div>
+    <div class="print-pane" id="printpane" hidden>
+      <div class="print-card">
+        <h3>Your print</h3>
+        <img id="printimg" alt="The marbled print lifted from the tray">
+        <p>It left the water once. It can never be made the same way again.</p>
+        <div class="row"><button class="pill solid" id="printdl">Download print</button><button class="pill ghost" id="printback">Back to the water</button></div>
+      </div>
+    </div>
+    <button class="show-tools" id="showtools" hidden>Show tools</button>
   </main>
 </div>
 
@@ -325,8 +382,10 @@ function render(){
     ctx.lineWidth=soft;ctx.strokeStyle=edge(c,.2);ctx.stroke();      // pigment pooling at the edge
     ctx.lineWidth=crisp;ctx.strokeStyle=edge(c,.55);ctx.stroke()};   // the fine rim left by ox-gall
   for(const s of shapes)drawOne(s.pts,s.color,s.fill);
-  if(active&&active.r>0)drawOne(circleW(active.x,active.y,active.r,Math.max(64,circleN(active.r)>>1),active.w||wobble(0)),active.color,active.fill);
+  if(active&&active.fall>0)drawFalling(active);
+  else if(active&&active.r>0)drawOne(circleW(active.x,active.y,active.r,Math.max(64,circleN(active.r)>>1),active.w||wobble(0)),active.color,active.fill);
   ctx.save();ctx.globalCompositeOperation="overlay";ctx.globalAlpha=1;ctx.drawImage(finish,0,0);ctx.restore();
+  drawRipples();
   drawKitText();
 }
 
@@ -359,8 +418,8 @@ cv.addEventListener("pointerdown",e=>{
   if(op||ops.length){showTip("The picture is still forming…");return}
   cv.setPointerCapture(e.pointerId);hideTip();
   const p=toU(e);snap();
-  if(tool==="drop"){finishActive();const ang=Math.random()*6.283,sp=0.012+Math.random()*0.02;active={x:p.x,y:p.y,r:0,R:baseR(),held:true,color,fill:jitter(color),w:wobble(0.08+Math.random()*0.1),vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,tail:0.9,tt:0}}
-  else stroke={x:p.x,y:p.y};
+  if(tool==="drop"){finishActive();const ang=Math.random()*6.283,sp=0.012+Math.random()*0.02;active={x:p.x,y:p.y,r:0,R:baseR(),held:true,color,fill:jitter(color),w:wobble(0.08+Math.random()*0.1),vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,tail:0.9,tt:0,fall:0.09}}
+  else{stroke={x:p.x,y:p.y};sfxStroke(true)}
 });
 cv.addEventListener("pointermove",e=>{
   const p=toU(e);
@@ -379,9 +438,9 @@ cv.addEventListener("pointermove",e=>{
       for(const s of shapes)displaceRake(s.pts,ax,ay,bx,by,nx,ny,half,sp,0.0045,sp*0.55)}
     drawRake(p);
   }
-  refineAll();stroke.x=p.x;stroke.y=p.y;dirty=true;
+  sfxStrokeSpeed(L);refineAll();stroke.x=p.x;stroke.y=p.y;dirty=true;
 });
-const up=()=>{if(active)active.held=false;if(stroke){stroke=null;cull();stir(0.35)}};
+const up=()=>{if(active)active.held=false;if(stroke){stroke=null;cull();stir(0.35);sfxStroke(false)}};
 cv.addEventListener("pointerleave",()=>{if(!stroke)clearRake()});
 // ---------- rake overlay (not part of the picture or the video) ----------
 const ov=$("ov"),octx=ov.getContext("2d");
@@ -411,7 +470,7 @@ function needleOp(pts,sig,speed){const st=sig*0.6,dense=[];
 function rakeOp(pts,half,sp,speed){const o=needleOp(pts,sp*0.75,speed);o.k="rake";o.half=half;o.sp=sp;return o}
 function stepOps(dt){
   if(!op){if(active||!ops.length)return;op=ops.shift();
-    if(op.k==="drop"){const ang=Math.random()*6.283;active={x:op.x,y:op.y,r:0,R:op.r,held:false,color:op.c,fill:jitter(op.c),grow:op.g||.28,w:wobble(0.05),vx:Math.cos(ang)*0.004,vy:Math.sin(ang)*0.004,tail:0.25,tt:0,calm:true};op=null;return}
+    if(op.k==="drop"){const ang=Math.random()*6.283;active={x:op.x,y:op.y,r:0,R:op.r,held:false,color:op.c,fill:jitter(op.c),grow:op.g||.28,w:wobble(0.05),vx:Math.cos(ang)*0.004,vy:Math.sin(ang)*0.004,tail:0.25,tt:0,calm:true,fall:0.13};op=null;return}
     if(op.k==="wait")op.t=0}
   if(op.k==="wait"){op.t+=dt;if(op.t>=op.d)op=null;return}
   op.acc+=op.rate*dt;let n=Math.floor(op.acc);op.acc-=n;
@@ -484,25 +543,105 @@ function drawKitText(){
   if(!kit||!kitText||kitAlpha<=0)return;const K=KITS[kit],m=W*0.075,maxW=W-m*2;
   ctx.save();ctx.globalAlpha=Math.min(1,kitAlpha);ctx.textBaseline="alphabetic";ctx.textAlign="left";
   let big=U*0.074;const mid=U*0.036,sm=U*0.025,tag=U*0.02;
-  ctx.font=`700 ${big}px "Atkinson Hyperlegible", system-ui, sans-serif`;{const w=ctx.measureText(SLOGAN).width;if(w>maxW)big=Math.max(U*0.05,big*maxW/w*0.99)}   // keep the slogan on one line where it fits
-  ctx.font=`500 ${tag}px "IBM Plex Mono", monospace`;const tagLine="COP31 · ANTALYA";
+  ctx.font=`700 ${big}px "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif`;{const w=ctx.measureText(SLOGAN).width;if(w>maxW)big=Math.max(U*0.05,big*maxW/w*0.99)}   // keep the slogan on one line where it fits
+  ctx.font=`500 ${tag}px "Atkinson Hyperlegible Mono", monospace`;const tagLine="COP31 · ANTALYA";
   ctx.fillStyle="#686A6C";ctx.fillText(tagLine.split("").join(String.fromCharCode(8202)),m,m+tag);
-  ctx.font=`700 ${big}px "Atkinson Hyperlegible", system-ui, sans-serif`;const L1=wrapText(ctx,SLOGAN,maxW);
-  ctx.font=`700 ${mid}px "Atkinson Hyperlegible", system-ui, sans-serif`;const L2=wrapText(ctx,K.line,maxW);
-  ctx.font=`400 ${sm}px "Atkinson Hyperlegible", system-ui, sans-serif`;const L3=wrapText(ctx,K.stat,maxW*0.92);
+  ctx.font=`700 ${big}px "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif`;const L1=wrapText(ctx,SLOGAN,maxW);
+  ctx.font=`700 ${mid}px "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif`;const L2=wrapText(ctx,K.line,maxW);
+  ctx.font=`400 ${sm}px "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif`;const L3=wrapText(ctx,K.stat,maxW*0.92);
   const hTot=L1.length*big*1.05+mid*0.5+L2.length*mid*1.22+sm*0.9+L3.length*sm*1.35+sm*1.4+tag;
   let y=H-m-hTot+big;
-  ctx.fillStyle="#131619";ctx.font=`700 ${big}px "Atkinson Hyperlegible", system-ui, sans-serif`;for(const l of L1){ctx.fillText(l,m,y);y+=big*1.05}
-  y+=mid*0.5;ctx.font=`700 ${mid}px "Atkinson Hyperlegible", system-ui, sans-serif`;ctx.fillStyle="#F96000";for(const l of L2){ctx.fillText(l,m,y);y+=mid*1.22}
-  y+=sm*0.9-mid*0.22;ctx.font=`400 ${sm}px "Atkinson Hyperlegible", system-ui, sans-serif`;ctx.fillStyle="#131619";for(const l of L3){ctx.fillText(l,m,y);y+=sm*1.35}
-  y+=sm*0.8;ctx.font=`500 ${tag}px "IBM Plex Mono", monospace`;ctx.fillStyle="#686A6C";ctx.fillText("#COP31   Source: UNFPA",m,y);
+  ctx.fillStyle="#131619";ctx.font=`700 ${big}px "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif`;for(const l of L1){ctx.fillText(l,m,y);y+=big*1.05}
+  y+=mid*0.5;ctx.font=`700 ${mid}px "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif`;ctx.fillStyle="#F96000";for(const l of L2){ctx.fillText(l,m,y);y+=mid*1.22}
+  y+=sm*0.9-mid*0.22;ctx.font=`400 ${sm}px "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif`;ctx.fillStyle="#131619";for(const l of L3){ctx.fillText(l,m,y);y+=sm*1.35}
+  y+=sm*0.8;ctx.font=`500 ${tag}px "Atkinson Hyperlegible Mono", monospace`;ctx.fillStyle="#686A6C";ctx.fillText("#COP31   Source: UNFPA",m,y);
   ctx.restore();
 }
+
+// ---------- the drop falls before it lands, and the water rings ----------
+let ripples=[];
+function drawFalling(a){
+  const k=1-Math.max(0,a.fall)/0.13,cx=W/2+a.x*U,cy=H/2+a.y*U,rr=Math.max(2,U*0.008*(0.6+0.4*k));
+  ctx.save();ctx.globalAlpha=0.22*k;ctx.fillStyle="#131619";ctx.beginPath();ctx.ellipse(cx,cy,rr*1.8*k+1,rr*0.7*k+1,0,0,7);ctx.fill();
+  ctx.globalAlpha=1;ctx.fillStyle=a.fill;const y=cy-(1-k)*U*0.06;
+  ctx.beginPath();ctx.moveTo(cx,y-rr*2.1);ctx.bezierCurveTo(cx+rr*1.1,y-rr*0.6,cx+rr,y+rr,cx,y+rr);ctx.bezierCurveTo(cx-rr,y+rr,cx-rr*1.1,y-rr*0.6,cx,y-rr*2.1);ctx.fill();
+  ctx.restore();
+}
+function drawRipples(){
+  if(!ripples.length)return;const dark=ground==="#131619";ctx.save();ctx.lineWidth=Math.max(1,U*0.0018);
+  for(const q of ripples){const k=q.t/0.9,e=1-Math.pow(1-k,3);
+    for(let j=0;j<2;j++){const kk=Math.max(0,e-j*0.18);if(kk<=0)continue;ctx.globalAlpha=(1-k)*(j?0.18:0.32);
+      ctx.strokeStyle=dark?"#EFF1F7":"#131619";ctx.beginPath();ctx.arc(W/2+q.x*U,H/2+q.y*U,(q.r*1.05+kk*0.07)*U,0,7);ctx.stroke()}}
+  ctx.restore();
+}
+
+// ---------- sound: a soft plip for each drop, a hiss for the stylus and comb ----------
+let actx=null,soundOn=false,strokeNode=null;
+function audio(){if(!actx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;actx=new C()}if(actx.state==="suspended")actx.resume();return actx}
+function setSound(on){soundOn=on;$("sound").setAttribute("aria-pressed",on?"true":"false");$("snd0").checked=on;if(on)audio()}
+function sfxDrop(r,calm){
+  if(!soundOn)return;const a=audio();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();
+  const f0=Math.max(260,Math.min(1250,1300-r*5200))*(0.92+Math.random()*0.16);
+  o.type="sine";o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*0.38,t+0.17);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(calm?0.09:0.2,t+0.006);g.gain.exponentialRampToValueAtTime(0.0001,t+0.32);
+  o.connect(g).connect(a.destination);o.start(t);o.stop(t+0.35);
+}
+function noiseBuffer(a){const b=a.createBuffer(1,a.sampleRate*2,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b}
+function sfxStroke(on){
+  if(!soundOn&&on)return;const a=actx;
+  if(on){const A=audio();if(!A)return;const src=A.createBufferSource();src.buffer=noiseBuffer(A);src.loop=true;
+    const f=A.createBiquadFilter();f.type="bandpass";f.frequency.value=tool==="comb"?900:1600;f.Q.value=0.8;const g=A.createGain();g.gain.value=0;
+    src.connect(f).connect(g).connect(A.destination);src.start();strokeNode={src,g}}
+  else if(strokeNode&&a){const n=strokeNode;n.g.gain.setTargetAtTime(0,a.currentTime,0.05);setTimeout(()=>{try{n.src.stop()}catch(e){}},300);strokeNode=null}
+}
+function sfxStrokeSpeed(L){if(strokeNode&&actx)strokeNode.g.gain.setTargetAtTime(Math.min(0.12,L*3),actx.currentTime,0.04)}
+
+// ---------- ambient: the tray paints itself behind the welcome screen ----------
+let ambient=false,ambT=0;
+function stepAmbient(dt){
+  ambT-=dt;if(ambT>0||ops.length||active||op)return;
+  const pts=shapes.reduce((n,s)=>n+s.pts.length,0)/2,ex=W/U/2,ey=H/U/2,A=ACCENTS[["blue","red","purple"][Math.floor(Math.random()*3)]];
+  const pal=[["#F96000","#FDCFB3"],["#131619","#EFF1F7"],["#AE4300","#FB904D"],[A[0][1],A[3][1]],["#686A6C","#D9DBE1"]];
+  if(Math.random()<0.28&&pts<140000){const y=(Math.random()*2-1)*ey*0.8,dir=Math.random()<0.5?1:-1;
+    ops.push(rakeOp([[-ex*1.05*dir,y],[ex*1.05*dir,y+(Math.random()-.5)*0.2]],0.9,0.04+Math.random()*0.03,0.14))}
+  else{const x=(Math.random()*2-1)*ex*0.9,y=(Math.random()*2-1)*ey*0.9,c=pal[Math.floor(Math.random()*pal.length)],R=0.04+Math.random()*0.09;
+    ops.push({k:"drop",x,y,r:R,c:c[0]},{k:"drop",x,y,r:R*0.6,c:c[1]});if(Math.random()<0.5)ops.push({k:"drop",x,y,r:R*0.3,c:c[0]})}
+  ambT=0.6+Math.random()*1.2;
+}
+function startWelcome(){document.body.classList.add("welcome");$("welcome").hidden=false;fmt="full";layout();ambient=true;ambT=0.3}
+function leaveWelcome(thenKit){
+  ambient=false;ops=[];op=null;finishActive();document.body.classList.remove("welcome");$("welcome").hidden=true;
+  requestAnimationFrame(()=>{layout();history=[];$("undo").disabled=true;if(thenKit)runKit(thenKit);else showTip(TIPS[tool])});
+}
+
+// ---------- lay the paper: the sheet comes down, the print lifts off ----------
+let printBlob=null;
+function layPaper(){
+  if(op||ops.length||active){showTip("Let the paint settle first.");return}
+  const was=kitText;render();
+  const t0=performance.now(),dur=900;
+  (function anim(){const k=Math.min(1,(performance.now()-t0)/dur),e=1-Math.pow(1-k,3);clearRake();
+    octx.save();octx.fillStyle="rgba(19,22,25,.25)";octx.fillRect(0,0,ov.width,ov.height*e+12);
+    octx.fillStyle="#FBFAF6";octx.fillRect(0,0,ov.width,ov.height*e);octx.restore();
+    if(k<1)requestAnimationFrame(anim);else setTimeout(showPrint,350)})();
+  sfxStroke(soundOn);setTimeout(()=>sfxStroke(false),800);
+}
+function showPrint(){
+  clearRake();
+  // the paper takes the pattern with a little of its own texture and a soft deckled border
+  const pc=document.createElement("canvas"),pad=Math.round(U*0.04);pc.width=W+pad*2;pc.height=H+pad*2;const g=pc.getContext("2d");
+  g.fillStyle="#FBFAF6";g.fillRect(0,0,pc.width,pc.height);g.drawImage(cv,pad,pad);
+  g.globalCompositeOperation="multiply";g.globalAlpha=.15;g.fillStyle=g.createPattern(paperTex,"repeat");g.fillRect(0,0,pc.width,pc.height);
+  g.globalCompositeOperation="source-over";g.globalAlpha=1;
+  pc.toBlob(b=>{printBlob=b;$("printimg").src=URL.createObjectURL(b);$("printpane").hidden=false},"image/png");
+}
+function setClean(on){document.body.classList.toggle("clean",on);$("showtools").hidden=!on;requestAnimationFrame(layout)}
 
 // ---------- loop ----------
 function step(dt){
   stepOps(dt);
-  if(active){let r=active.r;const g=active.grow||.22,w=active.w||wobble(0);
+  if(active&&active.fall>0){active.fall-=dt;dirty=true;if(active.fall<=0){ripples.push({x:active.x,y:active.y,r:active.R,t:0});sfxDrop(active.R,active.calm)}}
+  else if(active){let r=active.r;const g=active.grow||.22,w=active.w||wobble(0);
     if(r<active.R)r=Math.min(active.R,r+active.R*dt/g);
     else if(active.held)r+=0.05*dt;
     else if(active.tt<(active.tail||0)){active.tt+=dt;const q=active.tt/active.tail;r+=active.R*0.07*dt/active.tail*(1-q)*2}  // ink keeps creeping outward a moment
@@ -514,6 +653,8 @@ function step(dt){
         for(const s of shapes)displaceNeedle(s.pts,active.x,active.y,nx,ny,sig);active.x=nx;active.y=ny;active.vx*=0.97;active.vy*=0.97}
       refineAll();active.r=r;dirty=true}}
   stepFlow(dt);
+  if(ripples.length){for(const q of ripples)q.t+=dt;ripples=ripples.filter(q=>q.t<0.9);dirty=true}
+  if(ambient)stepAmbient(dt);
   if(kit&&!op&&!ops.length&&!active&&kitAlpha<1){kitAlpha=Math.min(1,kitAlpha+dt/0.9);dirty=true}
 }
 let last=null;
@@ -551,6 +692,15 @@ function setGround(g,push){if(push)snap();ground=g;document.querySelectorAll("[d
 document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>setGround(b.dataset.g,true));
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{fmt=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));layout()});
 document.querySelectorAll("[data-kit]").forEach(b=>b.onclick=()=>runKit(b.dataset.kit));
+$("enter").onclick=()=>{if($("snd0").checked)setSound(true);leaveWelcome()};
+$("watch").onclick=()=>{if($("snd0").checked)setSound(true);leaveWelcome(["health","gender","youth","resilience"][Math.floor(Math.random()*4)])};
+$("snd0").onchange=e=>{if(e.target.checked)audio()};
+$("sound").onclick=()=>setSound(!soundOn);
+$("paper").onclick=layPaper;
+$("printback").onclick=()=>{$("printpane").hidden=true;snap();shapes=[];kit=null;markKit();dirty=true;status("The water is clear again. Undo brings the pattern back.")};
+$("printdl").onclick=()=>{if(printBlob)saveBlob(printBlob,`ebru-print-${stamp()}.png`)};
+$("hideui").onclick=()=>setClean(true);$("showtools").onclick=()=>setClean(false);
+window.addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,textarea"))return;if((e.key==="h"||e.key==="H")&&!document.body.classList.contains("welcome"))setClean(!document.body.classList.contains("clean"))});
 $("kittext").onchange=e=>{kitText=e.target.checked;dirty=true};
 $("battal").onclick=()=>{snap();finishActive();battal(color,Math.round(70*Math.max(W,H)/U));cull()};
 $("family").onclick=()=>{if(op||ops.length)return;snap();finishActive();ops=familyOps();showTip("The family is forming, drop by drop")};
@@ -584,7 +734,7 @@ $("rec").onclick=()=>{
 $("vdl").onclick=()=>{if(vblob)saveBlob(vblob,`ebru-${stamp()}.${vext}`)};
 
 // ---------- boot ----------
-layout();seed();requestAnimationFrame(frame);setTimeout(hideTip,4500);
+layout();seed();startWelcome();requestAnimationFrame(frame);
 })();
 </script>
 
