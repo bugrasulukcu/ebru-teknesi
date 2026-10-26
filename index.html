@@ -68,6 +68,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .foot{margin-top:auto;font-size:11px;color:var(--muted)}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .stage{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
+#ov{position:absolute;pointer-events:none;box-shadow:none;border-radius:0}
 canvas{display:block;border-radius:6px;box-shadow:0 1px 2px var(--tray-shadow),0 24px 60px var(--tray-shadow);touch-action:none;cursor:crosshair}
 .tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(19,22,25,.82);color:#EFF1F7;font-size:12px;padding:7px 14px;border-radius:20px;pointer-events:none;transition:opacity .4s;white-space:nowrap}
 @media (max-width:760px){
@@ -170,6 +171,7 @@ canvas{display:block;border-radius:6px;box-shadow:0 1px 2px var(--tray-shadow),0
 
   <main class="stage" id="stage">
     <canvas id="cv" aria-label="Ebru teknesi. Dokunarak boya damlat, sürükleyerek desen çek."></canvas>
+    <canvas id="ov" aria-hidden="true"></canvas>
     <div class="tip" id="tip">Dokun: damla · Basılı tut: büyüt</div>
   </main>
 </div>
@@ -211,6 +213,15 @@ function displaceNeedle(p,ax,ay,bx,by,sig){
   for(let i=0;i<p.length;i+=2){const x=p[i],y=p[i+1];if(x<x0||x>x1||y<y0||y>y1)continue;
     let t=((x-ax)*vx+(y-ay)*vy)/L2;t=t<0?0:t>1?1:t;const d=Math.hypot(x-(ax+vx*t),y-(ay+vy*t));
     const f=(sig/(d+sig))*Math.exp(-d/(5*sig));p[i]=x+vx*f;p[i+1]=y+vy*f}
+}
+// rake: a bar of tines held across the direction of travel; only paint near the tines moves
+function displaceRake(p,ax,ay,bx,by,nx,ny,half,sp,sig,reach){
+  const vx=bx-ax,vy=by-ay,L=Math.hypot(vx,vy)||1e-12,mx=vx/L,my=vy/L,lim=half+sp,far=reach*3;
+  for(let i=0;i<p.length;i+=2){const rx=p[i]-ax,ry=p[i+1]-ay,n=rx*nx+ry*ny;if(n>lim||n<-lim)continue;
+    const a=rx*mx+ry*my,da=a<0?-a:a>L?a-L:0;if(da>far)continue;
+    const m=Math.abs(n-sp*Math.round(n/sp)),e=Math.min(1,Math.max(0,(half-Math.abs(n))/sp+0.5));
+    const f=(sig/(m+sig))*Math.exp(-(da*da)/(reach*reach))*e*e*(3-2*e);
+    p[i]+=vx*f;p[i+1]+=vy*f}
 }
 function displaceComb(p,sx,sy,vx,vy,sp,sig){
   const L=Math.hypot(vx,vy)||1e-12,nx=-vy/L,ny=vx/L;
@@ -256,12 +267,22 @@ const paperTex=(()=>{const S=700,c=document.createElement("canvas");c.width=c.he
     g.quadraticCurveTo(x+Math.cos(a+.6)*l*.5,y+Math.sin(a+.6)*l*.5,x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke()}
   const im=g.getImageData(0,0,S,S);for(let i=0;i<im.data.length;i+=4){const n=(Math.random()-.5)*26;im.data[i]+=n;im.data[i+1]+=n;im.data[i+2]+=n}
   g.putImageData(im,0,0);return c})();
-let pigPat=null,papPat=null;
+let pigPat=null,finish=null;
+// the surface finish (granulation, paper, light fall-off) is baked once per tray size and laid on in one pass
+function buildFinish(){
+  finish=document.createElement("canvas");finish.width=W;finish.height=H;const f=finish.getContext("2d");
+  f.fillStyle="#808080";f.fillRect(0,0,W,H);
+  const sc=Math.max(1,U/900);f.save();f.setTransform(sc,0,0,sc,0,0);
+  f.globalAlpha=.7;f.fillStyle=f.createPattern(pigmentTex,"repeat");f.fillRect(0,0,W/sc,H/sc);
+  f.globalAlpha=.45;f.fillStyle=f.createPattern(paperTex,"repeat");f.fillRect(0,0,W/sc,H/sc);f.restore();
+  const vg=f.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.hypot(W,H)*.62);
+  vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,0,0,.16)");f.fillStyle=vg;f.fillRect(0,0,W,H);
+}
 
 // ---------- render ----------
 function path(p){ctx.beginPath();const cx=W/2,cy=H/2;ctx.moveTo(cx+p[0]*U,cy+p[1]*U);for(let i=2;i<p.length;i+=2)ctx.lineTo(cx+p[i]*U,cy+p[i+1]*U);ctx.closePath()}
 function render(){
-  if(!pigPat){pigPat=ctx.createPattern(pigmentTex,"repeat");papPat=ctx.createPattern(paperTex,"repeat")}
+  if(!pigPat||!finish||finish.width!==W||finish.height!==H){buildFinish();pigPat=true}
   ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1;
   ctx.fillStyle=ground;ctx.fillRect(0,0,W,H);
   ctx.lineJoin="round";
@@ -271,15 +292,7 @@ function render(){
     ctx.lineWidth=crisp;ctx.strokeStyle=edge(c,.55);ctx.stroke()};   // the fine rim left by ox-gall
   for(const s of shapes)drawOne(s.pts,s.color,s.fill);
   if(active&&active.r>0)drawOne(circle(active.x,active.y,active.r,Math.max(64,circleN(active.r)>>1)),active.color,active.fill);
-  // granulation + paper, then a soft fall-off of light toward the edges
-  ctx.save();
-  const sc=Math.max(1,U/900);ctx.setTransform(sc,0,0,sc,0,0);
-  ctx.globalCompositeOperation="soft-light";ctx.globalAlpha=.55;ctx.fillStyle=pigPat;ctx.fillRect(0,0,W/sc,H/sc);
-  ctx.globalCompositeOperation="overlay";ctx.globalAlpha=.32;ctx.fillStyle=papPat;ctx.fillRect(0,0,W/sc,H/sc);
-  ctx.restore();
-  ctx.save();ctx.globalCompositeOperation="multiply";
-  const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.hypot(W,H)*.62);
-  vg.addColorStop(0,"rgba(255,255,255,1)");vg.addColorStop(1,"rgba(222,218,212,1)");ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);ctx.restore();
+  ctx.save();ctx.globalCompositeOperation="overlay";ctx.globalAlpha=1;ctx.drawImage(finish,0,0);ctx.restore();
 }
 
 // ---------- sizing: the tray fills the stage, or keeps a chosen ratio ----------
@@ -293,6 +306,7 @@ function layout(){
   W=Math.round(cw*k);H=Math.round(ch*k);cv.width=W;cv.height=H;
   // keep the pattern's scale tied to the tray's short side
   U=Math.min(W,H);pigPat=null;dirty=true;
+  if(typeof placeOverlay==='function')placeOverlay();
 }
 new ResizeObserver(()=>layout()).observe(stage);
 
@@ -302,26 +316,56 @@ $("undo").onclick=()=>{const h=history.pop();if(!h)return;ops=[];op=null;shapes=
 
 // ---------- pointer ----------
 function toU(e){const r=cv.getBoundingClientRect();return{x:((e.clientX-r.left)/r.width*W-W/2)/U,y:((e.clientY-r.top)/r.height*H-H/2)/U}}
-const baseR=()=>0.016+size*0.095,needleSig=()=>0.003+size*0.012,combSp=()=>0.025+size*0.075;
+const baseR=()=>0.016+size*0.095,needleSig=()=>0.003+size*0.012;
+const rakeHalf=()=>0.07+size*0.28,rakeSp=()=>0.018+size*0.028;
+let rakeDir={x:0,y:1};
 cv.addEventListener("pointerdown",e=>{
   e.preventDefault();
   if(op||ops.length){showTip("Aile figürü oluşuyor…");return}
   cv.setPointerCapture(e.pointerId);hideTip();
   const p=toU(e);snap();
   if(tool==="drop"){finishActive();active={x:p.x,y:p.y,r:0,R:baseR(),held:true,color,fill:jitter(color)}}
-  else stroke={x:p.x,y:p.y,sx:p.x,sy:p.y};
+  else stroke={x:p.x,y:p.y};
 });
 cv.addEventListener("pointermove",e=>{
-  if(!stroke)return;const p=toU(e);
+  const p=toU(e);
+  if(tool==="comb")drawRake(p);
+  if(!stroke)return;
   const dx=p.x-stroke.x,dy=p.y-stroke.y,L=Math.hypot(dx,dy);if(L<1e-5)return;
-  const st=tool==="needle"?needleSig()*0.6:0.004,n=Math.max(1,Math.ceil(L/st));
-  for(let k=0;k<n;k++){const ax=stroke.x+dx*k/n,ay=stroke.y+dy*k/n,bx=stroke.x+dx*(k+1)/n,by=stroke.y+dy*(k+1)/n;
-    if(tool==="needle")for(const s of shapes)displaceNeedle(s.pts,ax,ay,bx,by,needleSig());
-    else for(const s of shapes)displaceComb(s.pts,stroke.sx,stroke.sy,bx-ax,by-ay,combSp(),0.006);
-    refineAll()}
-  stroke.x=p.x;stroke.y=p.y;dirty=true;
+  if(tool==="needle"){
+    const st=needleSig()*0.6,n=Math.max(1,Math.ceil(L/st));
+    for(let k=0;k<n;k++){const ax=stroke.x+dx*k/n,ay=stroke.y+dy*k/n,bx=stroke.x+dx*(k+1)/n,by=stroke.y+dy*(k+1)/n;
+      for(const s of shapes)displaceNeedle(s.pts,ax,ay,bx,by,needleSig())}
+  }else{
+    // the rake turns with the hand, smoothly
+    let mx=rakeDir.x*0.75+dx/L*0.25,my=rakeDir.y*0.75+dy/L*0.25;const ml=Math.hypot(mx,my)||1;rakeDir={x:mx/ml,y:my/ml};
+    const sp=rakeSp(),half=rakeHalf(),st=sp*0.45,n=Math.max(1,Math.ceil(L/st)),nx=-rakeDir.y,ny=rakeDir.x;
+    for(let k=0;k<n;k++){const ax=stroke.x+dx*k/n,ay=stroke.y+dy*k/n,bx=stroke.x+dx*(k+1)/n,by=stroke.y+dy*(k+1)/n;
+      for(const s of shapes)displaceRake(s.pts,ax,ay,bx,by,nx,ny,half,sp,0.0045,sp*0.55)}
+    drawRake(p);
+  }
+  refineAll();stroke.x=p.x;stroke.y=p.y;dirty=true;
 });
 const up=()=>{if(active)active.held=false;if(stroke){stroke=null;cull()}};
+cv.addEventListener("pointerleave",()=>{if(!stroke)clearRake()});
+// ---------- rake overlay (not part of the picture or the video) ----------
+const ov=$("ov"),octx=ov.getContext("2d");
+function placeOverlay(){ov.style.left=cv.offsetLeft+"px";ov.style.top=cv.offsetTop+"px";ov.style.width=cv.style.width;ov.style.height=cv.style.height;ov.width=W;ov.height=H}
+function clearRake(){octx.clearRect(0,0,ov.width,ov.height)}
+function drawRake(p){
+  clearRake();
+  const cx=W/2+p.x*U,cy=H/2+p.y*U,nx=-rakeDir.y,ny=rakeDir.x,half=rakeHalf()*U,sp=rakeSp()*U,tl=Math.max(10,sp*1.1);
+  const dark=ground==="#131619",ink=dark?"rgba(239,241,247,":"rgba(19,22,25,";
+  octx.save();octx.lineCap="round";
+  // the bar sits just behind the tines
+  const bx=-rakeDir.x*tl,by=-rakeDir.y*tl;
+  octx.strokeStyle=ink+".55)";octx.lineWidth=Math.max(3,U*0.006);
+  octx.beginPath();octx.moveTo(cx+bx-nx*half,cy+by-ny*half);octx.lineTo(cx+bx+nx*half,cy+by+ny*half);octx.stroke();
+  octx.strokeStyle=ink+".7)";octx.lineWidth=Math.max(1.2,U*0.0018);
+  const k=Math.floor(half/sp);
+  for(let i=-k;i<=k;i++){const tx=cx+nx*i*sp,ty=cy+ny*i*sp;octx.beginPath();octx.moveTo(tx+bx,ty+by);octx.lineTo(tx,ty);octx.stroke()}
+  octx.restore();
+}
 cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
 function finishActive(){if(!active)return;shapes.push({pts:circle(active.x,active.y,active.r,circleN(active.r)),color:active.color,fill:active.fill});active=null;cull();dirty=true}
 
@@ -390,8 +434,8 @@ document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>{
   if(wasAcc){color=ACCENTS[accentKey][0][1];$("cname").textContent=ACCENTS[accentKey][0][0]}
   swatches($("sw2"),ACCENTS[accentKey])});
 const TIPS={drop:"Dokun: damla · Basılı tut: büyüt",needle:"Sürükle: boyayı iğneyle çek",comb:"Sürükle: tarak bütün tekneyi tarar"};
-document.querySelectorAll(".tool").forEach(b=>b.onclick=()=>{tool=b.dataset.tool;document.querySelectorAll(".tool").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));showTip(TIPS[tool])});
-$("size").oninput=e=>{size=e.target.value/100;$("sizev").textContent=size<0.25?"Küçük":size<0.6?"Orta":"Büyük"};
+document.querySelectorAll(".tool").forEach(b=>b.onclick=()=>{tool=b.dataset.tool;clearRake();document.querySelectorAll(".tool").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));showTip(TIPS[tool])});
+$("size").oninput=e=>{size=e.target.value/100;clearRake();$("sizev").textContent=size<0.25?"Küçük":size<0.6?"Orta":"Büyük"};
 function setGround(g,push){if(push)snap();ground=g;document.querySelectorAll("[data-g]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===g?"true":"false"));dirty=true}
 document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>setGround(b.dataset.g,true));
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{fmt=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));layout()});
